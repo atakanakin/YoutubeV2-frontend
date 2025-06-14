@@ -1,0 +1,57 @@
+/* ===== YOUTUBE OFFICIAL COLOR PALETTE ===== */
+:root {
+  /* YouTube Brand Colors */
+  --youtube-red: #ff0000;
+  --youtube-red-hover: #cc0000;
+  --youtube-red-dark: #cd201f;
+  
+  /* Light Theme Colors (YouTube Light Mode) */
+  --youtube-bg-primary: #ffffff;
+  --youtube-bg-secondary: #f9f9f9;
+  --youtube-bg-hover: #f2f2f2;
+  --youtube-text-primary: #0f0f0f;
+  --youtube-text-secondary: #606060;
+  --youtube-border: #e5e5e5;
+  --youtube-border-light: #f0f0f0;
+  
+  /* YouTube Spacing */
+  --youtube-space-xs: 4px;
+  --youtube-space-sm: 8px;
+  --youtube-space-md: 16px;
+  --youtube-space-lg: 24px;
+  --youtube-space-xl: 32px;
+  
+  /* YouTube Border Radius */
+  --youtube-radius-sm: 2px;
+  --youtube-radius-md: 4px;
+  --youtube-radius-lg: 8px;
+  --youtube-radius-full: 9999px;
+  
+  /* YouTube Shadows */
+  --youtube-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  --youtube-shadow-md: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Dark Theme (YouTube Dark Mode) */
+[data-theme="dark"] {
+  --youtube-bg-primary: #0f0f0f;
+  --youtube-bg-secondary: #181818;
+  --youtube-bg-hover: #272727;
+  --youtube-text-primary: #ffffff;
+  --youtube-text-secondary: #aaaaaa;
+  --youtube-border: #3d3d3d;
+  --youtube-border-light: #323232;
+}
+
+/* Legacy color variables for backward compatibility */
+:root {
+  --youtube-dark: #0f0f0f;
+  --youtube-dark-secondary: #181818;
+  --youtube-dark-hover: #272727;
+  --youtube-white: var(--youtube-bg-primary);
+  --youtube-gray-light: var(--youtube-bg-hover);
+  --youtube-gray: #909090;
+  --youtube-gray-dark: #606060;
+  --youtube-border-dark: #3d3d3d;
+  --youtube-text-white: #ffffff;
+} 
