@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './FloatingActionButton.css';
 import { IoAdd, IoClose, IoCheckmark } from 'react-icons/io5';
 import apiService from '../../services/apiService';
@@ -8,10 +8,19 @@ const FloatingActionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const fabContainerRef = useRef(null);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
     if (isOpen) {
+      setUrl('');
+    }
+  };
+
+  const handleBlur = (e) => {
+    // Check if the newly focused element is outside the component
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setIsOpen(false);
       setUrl('');
     }
   };
@@ -54,7 +63,12 @@ const FloatingActionButton = () => {
   };
 
   return (
-    <div className="fab-container">
+    <div
+      className="fab-container"
+      ref={fabContainerRef}
+      onBlur={handleBlur}
+      tabIndex={-1}
+    >
       {/* URL Input Overlay */}
       {isOpen && (
         <div className="fab-overlay">
