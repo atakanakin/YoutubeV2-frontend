@@ -1,0 +1,312 @@
+/* ===== QUALITY SELECTOR STYLES ===== */
+
+.quality-selector-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  backdrop-filter: blur(5px);
+}
+
+.quality-selector {
+  background-color: var(--youtube-bg-primary);
+  border: 1px solid var(--youtube-border);
+  border-radius: var(--youtube-radius-lg);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow: hidden;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== HEADER ===== */
+.quality-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--youtube-space-lg);
+  border-bottom: 1px solid var(--youtube-border);
+  background-color: var(--youtube-bg-secondary);
+}
+
+.quality-header h3 {
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--youtube-text-primary);
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: var(--youtube-text-secondary);
+  cursor: pointer;
+  padding: var(--youtube-space-sm);
+  border-radius: var(--youtube-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: var(--youtube-bg-hover);
+  color: var(--youtube-text-primary);
+}
+
+/* ===== TABS ===== */
+.quality-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--youtube-border);
+  background-color: var(--youtube-bg-primary);
+}
+
+.tab-button {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: var(--youtube-space-md) var(--youtube-space-lg);
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--youtube-text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.tab-button:hover {
+  background-color: var(--youtube-bg-hover);
+  color: var(--youtube-text-primary);
+}
+
+.tab-button.active {
+  color: var(--youtube-red);
+  border-bottom-color: var(--youtube-red);
+  background-color: var(--youtube-bg-primary);
+}
+
+/* ===== CONTENT ===== */
+.quality-content {
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--youtube-border) transparent;
+}
+
+.quality-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.quality-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.quality-content::-webkit-scrollbar-thumb {
+  background-color: var(--youtube-border);
+  border-radius: 4px;
+}
+
+.quality-content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--youtube-text-secondary);
+}
+
+/* ===== QUALITY INFO ===== */
+.quality-info {
+  padding: var(--youtube-space-md) var(--youtube-space-lg);
+  background-color: var(--youtube-bg-secondary);
+  border-bottom: 1px solid var(--youtube-border);
+}
+
+.quality-info p {
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 13px;
+  color: var(--youtube-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ===== QUALITY OPTIONS ===== */
+.video-quality-list,
+.audio-quality-list {
+  padding: var(--youtube-space-sm) 0;
+}
+
+.quality-option {
+  display: flex;
+  flex-direction: column;
+  padding: var(--youtube-space-md) var(--youtube-space-lg);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.quality-option:hover {
+  background-color: var(--youtube-bg-hover);
+}
+
+.quality-option.selected {
+  background-color: rgba(255, 0, 0, 0.1);
+  border-left-color: var(--youtube-red);
+}
+
+.quality-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--youtube-space-xs);
+}
+
+.quality-label {
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--youtube-text-primary);
+}
+
+.check-icon {
+  color: var(--youtube-red);
+  flex-shrink: 0;
+}
+
+.quality-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--youtube-space-md);
+}
+
+.quality-codec {
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 13px;
+  color: var(--youtube-text-secondary);
+  flex: 1;
+}
+
+.quality-size {
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 13px;
+  color: var(--youtube-text-secondary);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .quality-selector {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .quality-header {
+    padding: var(--youtube-space-md);
+  }
+  
+  .quality-header h3 {
+    font-size: 16px;
+  }
+  
+  .tab-button {
+    padding: var(--youtube-space-sm) var(--youtube-space-md);
+    font-size: 13px;
+  }
+  
+  .quality-option {
+    padding: var(--youtube-space-sm) var(--youtube-space-md);
+  }
+  
+  .quality-label {
+    font-size: 15px;
+  }
+  
+  .quality-codec,
+  .quality-size {
+    font-size: 12px;
+  }
+  
+  .quality-info {
+    padding: var(--youtube-space-sm) var(--youtube-space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .quality-selector {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    animation: modalSlideUp 0.3s ease-out;
+  }
+  
+  @keyframes modalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .quality-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  .quality-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--youtube-space-xs);
+  }
+  
+  .quality-codec,
+  .quality-size {
+    width: 100%;
+  }
+}
+
+/* ===== DARK THEME ADJUSTMENTS ===== */
+[data-theme="dark"] .quality-selector {
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .quality-option.selected {
+  background-color: rgba(255, 0, 0, 0.15);
+}
+
+/* ===== ACCESSIBILITY ===== */
+.quality-option:focus {
+  outline: 2px solid var(--youtube-red);
+  outline-offset: -2px;
+}
+
+.tab-button:focus {
+  outline: 2px solid var(--youtube-red);
+  outline-offset: -2px;
+}
+
+.close-button:focus {
+  outline: 2px solid var(--youtube-red);
+  outline-offset: 2px;
+} 

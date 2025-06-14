@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import './FloatingActionButton.css';
 import { IoAdd, IoClose, IoCheckmark } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/apiService';
 import toast from 'react-hot-toast';
 
@@ -9,6 +10,7 @@ const FloatingActionButton = () => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const fabContainerRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -45,6 +47,10 @@ const FloatingActionButton = () => {
         // Success case
         toast.success('Video processed successfully!');
         console.log('Video API Success:', result.data);
+
+        // Navigate to video page
+        const videoId = result.data.metadata.id;
+        navigate(`/video/${videoId}`);
 
         // Reset form
         setUrl('');
