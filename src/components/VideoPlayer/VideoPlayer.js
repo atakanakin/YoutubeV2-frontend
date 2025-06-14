@@ -28,6 +28,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
   // Stream selection
   const [selectedVideoStream, setSelectedVideoStream] = useState(null);
   const [selectedAudioStream, setSelectedAudioStream] = useState(null);
+  const [aspectRatio, setAspectRatio] = useState('16 / 9');
 
   // Enhanced loading states for proper sync
   const [videoReady, setVideoReady] = useState(false);
@@ -552,11 +553,15 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
           break;
         case 'ArrowUp':
           e.preventDefault();
-          changeVolume(Math.min(1, volume + 0.1));
+          const volUp = Math.min(1, volume + 0.1);
+          changeVolume(volUp);
+          showHud({ icon: <IoVolumeHigh size={30} />, text: `${Math.round(volUp * 100)}%` });
           break;
         case 'ArrowDown':
           e.preventDefault();
-          changeVolume(Math.max(0, volume - 0.1));
+          const volDown = Math.max(0, volume - 0.1);
+          changeVolume(volDown);
+          showHud({ icon: <IoVolumeHigh size={30} />, text: `${Math.round(volDown * 100)}%` });
           break;
         case 'KeyM':
           e.preventDefault();
@@ -691,6 +696,13 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     audio.addEventListener('canplay', handleAudioReady);
   }, [bothStreamsReady, unifiedPlayPause]);
 
+  // Effect to update aspect ratio when selectedVideoStream changes
+  useEffect(() => {
+    if (selectedVideoStream?.width && selectedVideoStream?.height) {
+      setAspectRatio(`${selectedVideoStream.width} / ${selectedVideoStream.height}`);
+    }
+  }, [selectedVideoStream]);
+
   if (!selectedVideoStream || !selectedAudioStream) {
     return (
       <div className="video-player-container">
@@ -705,6 +717,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
   return (
     <div
       className={`video-player-container ${isFullscreen ? 'fullscreen' : ''}`}
+      style={{ aspectRatio }}
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

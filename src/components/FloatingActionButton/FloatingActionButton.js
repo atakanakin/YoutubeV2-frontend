@@ -2,13 +2,10 @@ import React, { useState, useRef } from 'react';
 import './FloatingActionButton.css';
 import { IoAdd, IoClose, IoCheckmark } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
-import apiService from '../../services/apiService';
-import toast from 'react-hot-toast';
 
 const FloatingActionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [url, setUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const fabContainerRef = useRef(null);
   const navigate = useNavigate();
 
@@ -29,43 +26,14 @@ const FloatingActionButton = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!url.trim() || isLoading) return;
+    if (!url.trim()) return;
 
-    setIsLoading(true);
+    // Simply navigate to encoded URL route; VideoPage will process it.
+    navigate(`/video/${encodeURIComponent(url.trim())}`);
 
-    try {
-      // Show loading toast
-      const loadingToast = toast.loading('Processing video URL...');
-
-      // Call API
-      const result = await apiService.getVideo(url.trim());
-
-      // Dismiss loading toast
-      toast.dismiss(loadingToast);
-
-      if (result.success) {
-        // Success case
-        toast.success('Video processed successfully!');
-        console.log('Video API Success:', result.data);
-
-        // Navigate to video page
-        const videoId = result.data.metadata.id;
-        navigate(`/video/${videoId}`);
-
-        // Reset form
-        setUrl('');
-        setIsOpen(false);
-      } else {
-        // Error case (already handled by interceptor, but log for debugging)
-        console.log('Video API Error:', result.error);
-      }
-    } catch (error) {
-      // Unexpected error
-      console.error('Unexpected Error:', error);
-      toast.error('Something went wrong');
-    } finally {
-      setIsLoading(false);
-    }
+    // Reset form
+    setUrl('');
+    setIsOpen(false);
   };
 
   return (
@@ -87,12 +55,10 @@ const FloatingActionButton = () => {
                 onChange={(e) => setUrl(e.target.value)}
                 className="fab-input"
                 autoFocus
-                disabled={isLoading}
               />
               <button
                 type="submit"
-                className={`fab-submit-button ${isLoading ? 'loading' : ''}`}
-                disabled={!url.trim() || isLoading}
+                className="fab-submit-button"
               >
                 <IoCheckmark size={20} />
               </button>
@@ -106,7 +72,6 @@ const FloatingActionButton = () => {
         className={`fab-button ${isOpen ? 'fab-open' : ''}`}
         onClick={handleToggle}
         title={isOpen ? 'Close' : 'Enter URL'}
-        disabled={isLoading}
       >
         {isOpen ? <IoClose size={24} /> : <IoAdd size={24} />}
       </button>
