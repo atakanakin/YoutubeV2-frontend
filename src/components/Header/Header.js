@@ -6,10 +6,11 @@ import themeService from '../../services/themeService';
 const Header = () => {
   const [searchValue, setSearchValue] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isDark, setIsDark] = useState(themeService.isDark());
 
   useEffect(() => {
     const unsubscribe = themeService.addListener(() => {
-      // Force re-render when theme changes
+      setIsDark(themeService.isDark());
     });
     return unsubscribe;
   }, []);
@@ -65,7 +66,7 @@ const Header = () => {
             </button>
 
             <button className="theme-button" onClick={() => themeService.toggleTheme()}>
-              {themeService.isDark() ? <IoMoon size={20} /> : <IoSunny size={20} />}
+              {isDark ? <IoMoon size={20} /> : <IoSunny size={20} />}
             </button>
 
             <button className="sponsor-button">
