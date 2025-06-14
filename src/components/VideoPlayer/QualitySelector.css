@@ -1,7 +1,7 @@
 /* ===== QUALITY SELECTOR STYLES ===== */
 
 .quality-selector-overlay {
-  position: absolute;
+  position: fixed; /* full viewport overlay */
   top: 0;
   left: 0;
   right: 0;
@@ -10,7 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 20;
+  z-index: 9999;
+  overflow-y: auto; /* allow scroll if still taller than viewport */
   backdrop-filter: blur(5px);
 }
 
@@ -21,7 +22,9 @@
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.3);
   width: 90%;
   max-width: 480px;
-  max-height: 80vh;
+  height: 80vh; /* fixed 80% viewport for all */
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   animation: modalSlideIn 0.3s ease-out;
 }
@@ -107,8 +110,9 @@
 
 /* ===== CONTENT ===== */
 .quality-content {
-  max-height: 400px;
+  flex: 1 1 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: var(--youtube-border) transparent;
 }
@@ -128,6 +132,10 @@
 
 .quality-content::-webkit-scrollbar-thumb:hover {
   background-color: var(--youtube-text-secondary);
+}
+
+.quality-content > * {
+  min-height: 0;
 }
 
 /* ===== QUALITY INFO ===== */
@@ -214,7 +222,9 @@
 @media (max-width: 640px) {
   .quality-selector {
     width: 95%;
-    max-height: 90vh;
+    max-width: 480px;
+    height: auto;
+    max-height: 90vh; /* still leave small margin */
   }
   
   .quality-header {

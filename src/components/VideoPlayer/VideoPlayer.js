@@ -52,6 +52,16 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     hudTimeoutRef.current = setTimeout(() => setHudVisible(false), 1200);
   }, []);
 
+  // Determine highest resolution thumbnail for poster
+  const posterUrl = useMemo(() => {
+    if (!metadata?.thumbnails?.length) return undefined;
+    return metadata.thumbnails.reduce((best, t) => {
+      const bestRes = (best?.width || 0) * (best?.height || 0);
+      const curRes = (t.width || 0) * (t.height || 0);
+      return curRes > bestRes ? t : best;
+    }).url;
+  }, [metadata]);
+
   // Select default streams
   const defaultStreams = useMemo(() => {
     const videoDefault = videoStreams?.find(stream => String(stream.quality).includes('1080p')) || videoStreams?.[0];
@@ -657,7 +667,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
         ref={videoRef}
         className="video-element"
         src={selectedVideoStream.url}
-        poster={metadata.thumbnails?.[metadata.thumbnails.length - 1]?.url}
+        poster={posterUrl}
         preload="metadata"
         playsInline
         onClick={togglePlay}
