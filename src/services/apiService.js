@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 
 class ApiService {
   constructor() {
-    this.baseURL = 'http://localhost:5258/api';
+    this.baseURL = 'https://testapi.thebrainrot.fun/api';
     this.timeout = 30000;
 
     // Create axios instance
