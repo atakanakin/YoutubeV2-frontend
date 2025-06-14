@@ -9,8 +9,7 @@ import {
   IoVolumeOff,
   IoExpand,
   IoContract,
-  IoSettings,
-  IoKeypad
+  IoSettings
 } from 'react-icons/io5';
 
 const VideoControls = ({
@@ -33,7 +32,6 @@ const VideoControls = ({
   const [isDragging, setIsDragging] = useState(false);
   const [isVolumeHovered, setIsVolumeHovered] = useState(false);
   const [showPlaybackRates, setShowPlaybackRates] = useState(false);
-  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const progressRef = useRef(null);
   const volumeRef = useRef(null);
 
@@ -117,14 +115,6 @@ const VideoControls = ({
   const VolumeIcon = getVolumeIcon();
 
   const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
-
-  const keyboardShortcuts = [
-    { key: 'Space', action: 'Play/Pause' },
-    { key: '←/→', action: 'Seek ±10s' },
-    { key: '↑/↓', action: 'Volume ±10%' },
-    { key: 'M', action: 'Mute/Unmute' },
-    { key: 'F', action: 'Fullscreen' }
-  ];
 
   return (
     <>
@@ -222,7 +212,7 @@ const VideoControls = ({
             </div>
 
             {/* Time Display */}
-            <div className="time-display" aria-live="polite">
+            <div className={`time-display ${isVolumeHovered ? 'shifted' : ''}`} aria-live="polite">
               <span className="current-time">{formatTime(currentTime)}</span>
               <span className="time-separator"> / </span>
               <span className="duration">{formatTime(duration)}</span>
@@ -231,34 +221,6 @@ const VideoControls = ({
 
           {/* Right Side Controls */}
           <div className="controls-right">
-            {/* Keyboard Shortcuts Help */}
-            <div className="keyboard-help-control">
-              <button 
-                className="control-button keyboard-button" 
-                onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
-                aria-label="Show keyboard shortcuts"
-                title="Keyboard shortcuts"
-              >
-                <IoKeypad size={20} />
-              </button>
-              
-              {showKeyboardHelp && (
-                <div className="keyboard-help-menu">
-                  <div className="keyboard-help-header">
-                    <h4>Keyboard Shortcuts</h4>
-                  </div>
-                  <div className="keyboard-shortcuts-list">
-                    {keyboardShortcuts.map((shortcut, index) => (
-                      <div key={index} className="keyboard-shortcut">
-                        <kbd className="keyboard-key">{shortcut.key}</kbd>
-                        <span className="keyboard-action">{shortcut.action}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* Playback Rate */}
             <div className="playback-rate-control">
               <button 

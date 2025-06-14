@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { IoPlaySkipForward, IoPlaySkipBack, IoVolumeMute, IoVolumeHigh } from 'react-icons/io5';
 import './VideoPlayer.css';
 import VideoControls from './VideoControls';
 import QualitySelector from './QualitySelector';
@@ -39,10 +40,22 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
   // Control visibility timer
   const controlsTimeoutRef = useRef(null);
 
-  // Memoized default streams to prevent unnecessary re-renders
+  // HUD message now stores an object { icon: JSX, text?: string, position?: 'left'|'right'|'center' }
+  const [hudMessage, setHudMessage] = useState(null);
+  const [hudVisible, setHudVisible] = useState(false);
+  const hudTimeoutRef = useRef(null);
+
+  const showHud = useCallback((payload) => {
+    setHudMessage({ ...payload, _id: Date.now() });
+    setHudVisible(true);
+    if (hudTimeoutRef.current) clearTimeout(hudTimeoutRef.current);
+    hudTimeoutRef.current = setTimeout(() => setHudVisible(false), 1200);
+  }, []);
+
+  // Select default streams
   const defaultStreams = useMemo(() => {
-    const videoDefault = videoStreams?.find(stream => stream.quality === '720p') || videoStreams?.[0];
-    const audioDefault = audioStreams?.find(stream => stream.quality === 'mp4a.40.2') || audioStreams?.[0];
+    const videoDefault = videoStreams?.find(stream => String(stream.quality).includes('1080p')) || videoStreams?.[0];
+    const audioDefault = audioStreams?.[0];
     return { video: videoDefault, audio: audioDefault };
   }, [videoStreams, audioStreams]);
 
@@ -396,13 +409,25 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
 
     if (!video || !audio) return;
 
-    // Store current playing state
-    wasPlayingRef.current = !video.paused;
+    // Determine if the player was actively playing **before** this seek
+    // If it was, remember that we should resume playback *after* all seeks finish.
+    // IMPORTANT: We ONLY ever set this flag to true here – we never set it to false
+    // during subsequent (possibly rapid-fire) seeks. It will be cleared once playback
+    // successfully resumes (see the bothStreamsReady effect below).
+    if (!video.paused) {
+      wasPlayingRef.current = true;
+    }
 
     // Pause both streams immediately
     video.pause();
     audio.pause();
     setIsPlaying(false);
+
+    // Reset readiness so `bothStreamsReady` waits for fresh `canplay` events at the
+    // new seek position. Without this the player could try to resume **before**
+    // audio/video have buffered enough, causing a quick play-then-pause symptom.
+    setVideoReady(false);
+    setAudioReady(false);
 
     // Set seeking state
     setIsSeeking(true);
@@ -476,22 +501,30 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
         case 'ArrowLeft':
           e.preventDefault();
           seek(Math.max(0, currentTime - 10));
+          showHud({ icon: <IoPlaySkipBack size={36} />, text: '10', position: 'left' });
           break;
         case 'ArrowRight':
           e.preventDefault();
           seek(Math.min(duration, currentTime + 10));
+          showHud({ icon: <IoPlaySkipForward size={36} />, text: '10', position: 'right' });
           break;
         case 'ArrowUp':
           e.preventDefault();
-          changeVolume(Math.min(1, volume + 0.1));
+          const newVolUp = Math.min(1, volume + 0.1);
+          changeVolume(newVolUp);
+          showHud({ icon: <IoVolumeHigh size={30} />, text: `${Math.round(newVolUp * 100)}%` });
           break;
         case 'ArrowDown':
           e.preventDefault();
-          changeVolume(Math.max(0, volume - 0.1));
+          const newVolDown = Math.max(0, volume - 0.1);
+          changeVolume(newVolDown);
+          showHud({ icon: <IoVolumeHigh size={30} />, text: `${Math.round(newVolDown * 100)}%` });
           break;
         case 'KeyM':
           e.preventDefault();
+          const willMute = !isMuted;
           toggleMute();
+          showHud({ icon: willMute ? <IoVolumeMute size={30} /> : <IoVolumeHigh size={30} />, text: willMute ? 'Muted' : 'Unmuted' });
           break;
         case 'KeyF':
           e.preventDefault();
@@ -504,7 +537,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
 
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [currentTime, duration, volume, isPlaying, togglePlay, seek, changeVolume, toggleMute, toggleFullscreen]);
+  }, [currentTime, duration, volume, isPlaying, togglePlay, seek, changeVolume, toggleMute, toggleFullscreen, showHud]);
 
   // Fullscreen change handler
   useEffect(() => {
@@ -645,6 +678,14 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
           {isChangingStreams && <p>Changing quality...</p>}
           {isSeeking && <p>Seeking...</p>}
           {(videoBuffering || audioBuffering) && <p>Buffering...</p>}
+        </div>
+      )}
+
+      {/* HUD message */}
+      {hudMessage && (
+        <div className={`hud-bubble ${hudMessage.position || 'center'} ${hudVisible ? 'visible' : ''}`} role="status" aria-live="polite">
+          {hudMessage.icon}
+          {hudMessage.text && <span className="hud-text">{hudMessage.text}</span>}
         </div>
       )}
 
