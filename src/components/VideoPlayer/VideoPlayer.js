@@ -215,6 +215,11 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     };
 
     const handleVideoWaiting = () => {
+      // Remember if we were actively playing so we can auto-resume later
+      if (!video.paused) {
+        wasPlayingRef.current = true;
+        setIsPlaying(false);
+      }
       setVideoBuffering(true);
       // CRITICAL: Pause audio when video is buffering
       if (audioRef.current && !audioRef.current.paused) {
@@ -298,6 +303,11 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     };
 
     const handleAudioWaiting = () => {
+      // Remember play state to auto-resume
+      if (!audio.paused) {
+        wasPlayingRef.current = true;
+        setIsPlaying(false);
+      }
       setAudioBuffering(true);
       // CRITICAL: Pause video when audio is buffering
       if (videoRef.current && !videoRef.current.paused) {
