@@ -3,7 +3,7 @@ import './styles/colors.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Main from './components/Main/Main';
-import VideoPage from './components/VideoPage/VideoPage';
+import VideoPage from './pages/VideoPage/VideoPage';
 import FloatingActionButton from './components/FloatingActionButton/FloatingActionButton';
 import { Toaster } from 'react-hot-toast';
 

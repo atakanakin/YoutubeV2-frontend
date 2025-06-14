@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import './VideoPage.css';
-import VideoPlayer from '../VideoPlayer/VideoPlayer';
-import VideoMetadata from '../VideoMetadata/VideoMetadata';
+import VideoPlayer from '../../components/VideoPlayer/VideoPlayer';
+import VideoMetadata from '../../components/VideoMetadata/VideoMetadata';
 import apiService from '../../services/apiService';
 import toast from 'react-hot-toast';
 
@@ -11,8 +11,13 @@ const VideoPage = () => {
   const [videoData, setVideoData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const fetchInitiated = useRef(false); // Ref to track if fetch has been initiated
 
   useEffect(() => {
+    // Only run the fetch if it hasn't been initiated yet for this videoId
+    if (fetchInitiated.current) return;
+    fetchInitiated.current = true;
+
     const fetchVideo = async () => {
       if (!videoId) {
         setError('Video ID is required');
@@ -42,6 +47,13 @@ const VideoPage = () => {
     };
 
     fetchVideo();
+  }, [videoId]); // Keep videoId in dependency array to refetch if it changes
+
+  // Reset the fetch flag when the component unmounts or videoId changes
+  useEffect(() => {
+    return () => {
+      fetchInitiated.current = false;
+    };
   }, [videoId]);
 
   if (isLoading) {

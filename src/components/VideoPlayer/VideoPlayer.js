@@ -7,6 +7,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
   const videoRef = useRef(null);
   const audioRef = useRef(null);
   const containerRef = useRef(null);
+  const syncRequestRef = useRef(null);
   
   // Player state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,18 +43,41 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     }
   }, [videoStreams, audioStreams]);
   
-  // Sync video and audio
+  // Sync video and audio using requestAnimationFrame for better performance
   const syncStreams = useCallback(() => {
     const video = videoRef.current;
     const audio = audioRef.current;
     
     if (!video || !audio) return;
     
+    // Sync audio to video's current time if deviation is significant
     const timeDiff = Math.abs(video.currentTime - audio.currentTime);
-    if (timeDiff > 0.1) { // If out of sync by more than 100ms
+    if (timeDiff > 0.15) { // 150ms tolerance
       audio.currentTime = video.currentTime;
     }
+    
+    // Sync playback rate and pause state constantly
+    if (audio.playbackRate !== video.playbackRate) {
+      audio.playbackRate = video.playbackRate;
+    }
+    if (video.paused && !audio.paused) {
+      audio.pause();
+    } else if (!video.paused && audio.paused) {
+      audio.play().catch(console.error);
+    }
+    
+    syncRequestRef.current = requestAnimationFrame(syncStreams);
   }, []);
+  
+  // Start and stop the sync loop
+  useEffect(() => {
+    syncRequestRef.current = requestAnimationFrame(syncStreams);
+    return () => {
+      if (syncRequestRef.current) {
+        cancelAnimationFrame(syncRequestRef.current);
+      }
+    };
+  }, [syncStreams]);
   
   // Handle video/audio events
   useEffect(() => {
@@ -69,7 +93,6 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     
     const handleTimeUpdate = () => {
       setCurrentTime(video.currentTime);
-      syncStreams();
     };
     
     const handlePlay = () => {
@@ -85,16 +108,18 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     const handleEnded = () => {
       setIsPlaying(false);
       audio.pause();
-      audio.currentTime = 0;
+      // Resetting audio time might not be needed as video drives the sync
     };
     
-    const handleLoadStart = () => {
-      setIsLoading(true);
+    const handleSeeking = () => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = videoRef.current.currentTime;
+      }
     };
     
-    const handleCanPlay = () => {
-      setIsLoading(false);
-    };
+    const handleLoadStart = () => setIsLoading(true);
+    const handleCanPlay = () => setIsLoading(false);
+    const handleWaiting = () => setIsLoading(true);
     
     // Add event listeners
     video.addEventListener('loadeddata', handleLoadedData);
@@ -102,11 +127,10 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('ended', handleEnded);
+    video.addEventListener('seeking', handleSeeking);
     video.addEventListener('loadstart', handleLoadStart);
     video.addEventListener('canplay', handleCanPlay);
-    
-    // Sync interval for extra safety
-    const syncInterval = setInterval(syncStreams, 1000);
+    video.addEventListener('waiting', handleWaiting);
     
     return () => {
       video.removeEventListener('loadeddata', handleLoadedData);
@@ -114,11 +138,12 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('seeking', handleSeeking);
       video.removeEventListener('loadstart', handleLoadStart);
       video.removeEventListener('canplay', handleCanPlay);
-      clearInterval(syncInterval);
+      video.removeEventListener('waiting', handleWaiting);
     };
-  }, [syncStreams, selectedVideoStream, selectedAudioStream]);
+  }, [selectedVideoStream, selectedAudioStream]); // Rerun when streams change
   
   // Update playback rate for both streams
   useEffect(() => {
