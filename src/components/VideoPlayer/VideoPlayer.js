@@ -39,6 +39,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
 
   // Control visibility timer
   const controlsTimeoutRef = useRef(null);
+  const seekHoldRef = useRef(null);
 
   // HUD message now stores an object { icon: JSX, text?: string, position?: 'left'|'right'|'center' }
   const [hudMessage, setHudMessage] = useState(null);
@@ -518,7 +519,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
 
   // Keyboard controls
   useEffect(() => {
-    const handleKeyPress = (e) => {
+    const handleKeyDown = (e) => {
       // Only handle if video player is focused or no input is focused
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
@@ -529,25 +530,33 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
           break;
         case 'ArrowLeft':
           e.preventDefault();
-          seek(Math.max(0, currentTime - 10));
-          showHud({ icon: <IoPlaySkipBack size={36} />, text: '10', position: 'left' });
+          const leftSeek = () => {
+            seek(Math.max(0, (videoRef.current?.currentTime || 0) - 10));
+            showHud({ icon: <IoPlaySkipBack size={36} />, text: '10', position: 'left' });
+          };
+          leftSeek();
+          if (!seekHoldRef.current) {
+            seekHoldRef.current = setInterval(leftSeek, 350);
+          }
           break;
         case 'ArrowRight':
           e.preventDefault();
-          seek(Math.min(duration, currentTime + 10));
-          showHud({ icon: <IoPlaySkipForward size={36} />, text: '10', position: 'right' });
+          const rightSeek = () => {
+            seek(Math.min(duration, (videoRef.current?.currentTime || 0) + 10));
+            showHud({ icon: <IoPlaySkipForward size={36} />, text: '10', position: 'right' });
+          };
+          rightSeek();
+          if (!seekHoldRef.current) {
+            seekHoldRef.current = setInterval(rightSeek, 350);
+          }
           break;
         case 'ArrowUp':
           e.preventDefault();
-          const newVolUp = Math.min(1, volume + 0.1);
-          changeVolume(newVolUp);
-          showHud({ icon: <IoVolumeHigh size={30} />, text: `${Math.round(newVolUp * 100)}%` });
+          changeVolume(Math.min(1, volume + 0.1));
           break;
         case 'ArrowDown':
           e.preventDefault();
-          const newVolDown = Math.max(0, volume - 0.1);
-          changeVolume(newVolDown);
-          showHud({ icon: <IoVolumeHigh size={30} />, text: `${Math.round(newVolDown * 100)}%` });
+          changeVolume(Math.max(0, volume - 0.1));
           break;
         case 'KeyM':
           e.preventDefault();
@@ -564,9 +573,23 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
       }
     };
 
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [currentTime, duration, volume, isPlaying, isMuted, togglePlay, seek, changeVolume, toggleMute, toggleFullscreen, showHud]);
+    const handleKeyUp = (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+        if (seekHoldRef.current) {
+          clearInterval(seekHoldRef.current);
+          seekHoldRef.current = null;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keyup', handleKeyUp);
+      if (seekHoldRef.current) clearInterval(seekHoldRef.current);
+    };
+  }, [duration, volume, isMuted, togglePlay, seek, changeVolume, toggleMute, toggleFullscreen, showHud]);
 
   // Fullscreen change handler
   useEffect(() => {
