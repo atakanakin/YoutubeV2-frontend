@@ -1,17 +1,15 @@
 import './App.css';
 import './styles/colors.css';
 import Header from './components/Header/Header';
+import Main from './components/Main/Main';
+import FloatingActionButton from './components/FloatingActionButton/FloatingActionButton';
 
 function App() {
   return (
     <div className="App">
       <Header />
-      <main style={{ marginTop: '64px' }}>
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <h1>YouTube V2</h1>
-          <p>Testing things!</p>
-        </div>
-      </main>
+      <Main />
+      <FloatingActionButton />
     </div>
   );
 }

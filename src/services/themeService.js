@@ -7,16 +7,18 @@ class ThemeService {
     };
     
     this.currentTheme = this.getStoredTheme();
-    this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    this.mediaQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
     this.listeners = new Set();
     
     // Initialize theme
     this.applyTheme();
     
     // Listen for system theme changes only for initial detection
-    this.mediaQuery.addEventListener('change', () => {
-      // No auto mode, so we don't need to do anything
-    });
+    if (this.mediaQuery) {
+      this.mediaQuery.addEventListener('change', () => {
+        // No auto mode, so we don't need to do anything
+      });
+    }
   }
   
   getStoredTheme() {
@@ -25,7 +27,10 @@ class ThemeService {
       return stored;
     }
     // Default to system preference on first visit
-    return this.mediaQuery.matches ? this.THEMES.DARK : this.THEMES.LIGHT;
+    if (this.mediaQuery && this.mediaQuery.matches) {
+      return this.THEMES.DARK;
+    }
+    return this.THEMES.LIGHT;
   }
   
   setTheme(theme) {

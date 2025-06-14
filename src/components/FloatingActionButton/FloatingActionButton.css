@@ -1,0 +1,204 @@
+/* ===== FLOATING ACTION BUTTON STYLES ===== */
+
+.fab-container {
+  position: fixed;
+  bottom: var(--youtube-space-xl);
+  right: var(--youtube-space-xl);
+  z-index: 1000;
+}
+
+.fab-button {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--youtube-radius-full);
+  background-color: var(--youtube-red);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 2;
+}
+
+.fab-button:hover {
+  background-color: var(--youtube-red-hover);
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 8px 20px rgba(255, 0, 0, 0.4);
+}
+
+.fab-button:active {
+  transform: scale(0.9);
+  transition: all 0.1s ease;
+}
+
+.fab-button.fab-open {
+  transform: rotate(135deg) scale(1.1);
+  background-color: var(--youtube-red-hover);
+  box-shadow: 0 6px 16px rgba(255, 0, 0, 0.35);
+}
+
+.fab-button.fab-open:hover {
+  transform: rotate(135deg) scale(1.2);
+  box-shadow: 0 8px 20px rgba(255, 0, 0, 0.45);
+}
+
+/* ===== URL INPUT OVERLAY ===== */
+
+.fab-overlay {
+  position: absolute;
+  bottom: 72px;
+  right: 0;
+  background-color: var(--youtube-bg-primary);
+  border: 1px solid var(--youtube-border);
+  border-radius: var(--youtube-radius-lg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  padding: var(--youtube-space-lg);
+  width: 320px;
+  animation: fabSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1;
+  backdrop-filter: blur(10px);
+}
+
+.fab-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.fab-input-container {
+  display: flex;
+  align-items: center;
+  gap: var(--youtube-space-sm);
+  width: 100%;
+}
+
+.fab-input {
+  flex: 1;
+  padding: var(--youtube-space-md);
+  border: 2px solid var(--youtube-border);
+  border-radius: var(--youtube-radius-md);
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 14px;
+  background-color: var(--youtube-bg-primary);
+  color: var(--youtube-text-primary);
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.fab-input:focus {
+  border-color: var(--youtube-red);
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.fab-input::placeholder {
+  color: var(--youtube-text-secondary);
+}
+
+.fab-submit-button {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--youtube-radius-md);
+  background-color: var(--youtube-red);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.fab-submit-button:hover:not(:disabled) {
+  background-color: var(--youtube-red-hover);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+}
+
+.fab-submit-button:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.fab-submit-button:disabled {
+  background-color: var(--youtube-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes fabSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.8) rotate(-10deg);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-5px) scale(1.05) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 640px) {
+  .fab-container {
+    bottom: var(--youtube-space-lg);
+    right: var(--youtube-space-lg);
+  }
+  
+  .fab-button {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .fab-overlay {
+    width: 280px;
+    right: 0;
+    bottom: 64px;
+    padding: var(--youtube-space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .fab-container {
+    bottom: var(--youtube-space-md);
+    right: var(--youtube-space-md);
+  }
+  
+  .fab-overlay {
+    width: calc(100vw - 80px);
+    right: 0px;
+    bottom: 64px;
+    padding: var(--youtube-space-md);
+    max-width: 300px;
+  }
+  
+  .fab-input {
+    font-size: 16px;
+    padding: var(--youtube-space-sm) var(--youtube-space-md);
+  }
+}
+
+@media (max-width: 360px) {
+  .fab-container {
+    bottom: var(--youtube-space-md);
+    right: var(--youtube-space-sm);
+  }
+  
+  .fab-overlay {
+    width: calc(100vw - 64px);
+    right: 0;
+    bottom: 64px;
+    padding: var(--youtube-space-sm);
+  }
+} 
