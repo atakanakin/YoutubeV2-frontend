@@ -64,7 +64,16 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
 
   // Select default streams
   const defaultStreams = useMemo(() => {
-    const videoDefault = videoStreams?.find(stream => String(stream.quality).includes('1080p')) || videoStreams?.[0];
+    let storedPref = null;
+    if (typeof window !== 'undefined') {
+      try {
+        storedPref = localStorage.getItem('preferredVideoQuality');
+      } catch (_) {}
+    }
+    const videoDefault = videoStreams?.find(stream => {
+      if (storedPref && String(stream.quality).includes(storedPref)) return true;
+      return !storedPref && String(stream.quality).includes('1080p');
+    }) || videoStreams?.[0];
     const audioDefault = audioStreams?.[0];
     return { video: videoDefault, audio: audioDefault };
   }, [videoStreams, audioStreams]);
@@ -557,7 +566,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
 
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [currentTime, duration, volume, isPlaying, togglePlay, seek, changeVolume, toggleMute, toggleFullscreen, showHud]);
+  }, [currentTime, duration, volume, isPlaying, isMuted, togglePlay, seek, changeVolume, toggleMute, toggleFullscreen, showHud]);
 
   // Fullscreen change handler
   useEffect(() => {
@@ -597,6 +606,12 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
 
     // Change stream
     setSelectedVideoStream(stream);
+
+    // Persist preferred resolution (e.g., '1440p')
+    const match = stream.quality.match(/\d+p/);
+    if (match && typeof window !== 'undefined') {
+      try { localStorage.setItem('preferredVideoQuality', match[0]); } catch(_) {}
+    }
 
     // Wait for video to be ready, then restore state
     const handleVideoReady = () => {

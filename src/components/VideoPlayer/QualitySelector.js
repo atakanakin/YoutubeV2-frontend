@@ -114,8 +114,7 @@ const QualitySelector = ({
                 const stream = getBestVideoStreamForQuality(quality);
                 if (!stream) return null;
                 
-                const isSelected = selectedVideoStream?.quality === quality && 
-                                 selectedVideoStream?.container === stream.container;
+                const isSelected = selectedVideoStream?.quality === stream.quality;
                 
                 return (
                   <div 
