@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './Header.css';
 import { IoSearch, IoClose, IoHeartOutline, IoSunny, IoMoon, IoLogoYoutube } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 import themeService from '../../services/themeService';
 
 const Header = () => {
   const [searchValue, setSearchValue] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDark, setIsDark] = useState(themeService.isDark());
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = themeService.addListener(() => {
@@ -35,12 +37,16 @@ const Header = () => {
     setSearchValue('');
   };
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   return (
     <header className="header">
       <div className={`header-container ${isSearchOpen ? 'search-active' : ''}`}>
         <div className="header-normal">
           <div className="header-left">
-            <IoLogoYoutube className="header-logo" />
+            <IoLogoYoutube className="header-logo" onClick={handleLogoClick} />
           </div>
 
           <div className="header-center">

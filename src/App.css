@@ -46,3 +46,43 @@
     right: var(--youtube-space-sm) !important;
   }
 }
+
+/* ===== GLOBAL LAYOUT / BACKGROUND ===== */
+html, body {
+  /* Ensure the page background fills overscroll area (fixes white glow in dark mode) */
+  background-color: var(--youtube-bg-primary);
+  color: var(--youtube-text-primary);
+  /* Smooth scrolling for anchor links */
+  scroll-behavior: smooth;
+  transition: background-color 0.2s ease;
+}
+
+/* Custom scrollbar to match YouTube-style theme */
+body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--youtube-border) transparent;
+}
+
+body::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: var(--youtube-border);
+  border-radius: 4px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background-color: var(--youtube-text-secondary);
+}
+
+/* Dark-theme specific tweaks */
+[data-theme="dark"] html,
+[data-theme="dark"] body {
+  /* Explicitly set to black so overscroll glow blends seamlessly */
+  background-color: #000;
+}
