@@ -9,7 +9,8 @@ import {
   IoVolumeOff,
   IoExpand,
   IoContract,
-  IoSettings
+  IoSettings,
+  IoKeypad
 } from 'react-icons/io5';
 
 const VideoControls = ({
@@ -32,6 +33,7 @@ const VideoControls = ({
   const [isDragging, setIsDragging] = useState(false);
   const [isVolumeHovered, setIsVolumeHovered] = useState(false);
   const [showPlaybackRates, setShowPlaybackRates] = useState(false);
+  const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const progressRef = useRef(null);
   const volumeRef = useRef(null);
 
@@ -49,35 +51,60 @@ const VideoControls = ({
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // Progress bar handling
+  // Progress bar handling with improved precision
   const handleProgressMouseDown = useCallback((e) => {
+    e.preventDefault();
     setIsDragging(true);
     const rect = progressRef.current.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
+    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const newTime = percent * duration;
-    onSeek(Math.max(0, Math.min(duration, newTime)));
+    onSeek(newTime);
   }, [duration, onSeek]);
 
   const handleProgressMouseMove = useCallback((e) => {
     if (!isDragging) return;
     
     const rect = progressRef.current.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
+    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     const newTime = percent * duration;
-    onSeek(Math.max(0, Math.min(duration, newTime)));
+    onSeek(newTime);
   }, [isDragging, duration, onSeek]);
 
   const handleProgressMouseUp = useCallback(() => {
     setIsDragging(false);
   }, []);
 
-  // Volume control handling
+  // Volume control handling with improved precision
   const handleVolumeMouseDown = useCallback((e) => {
+    e.preventDefault();
     const rect = volumeRef.current.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    const newVolume = Math.max(0, Math.min(1, percent));
-    onVolumeChange(newVolume);
+    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    onVolumeChange(percent);
   }, [onVolumeChange]);
+
+  // Progress bar keyboard navigation
+  const handleProgressKeyDown = useCallback((e) => {
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault();
+        onSeek(Math.max(0, currentTime - 10));
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        onSeek(Math.min(duration, currentTime + 10));
+        break;
+      case 'Home':
+        e.preventDefault();
+        onSeek(0);
+        break;
+      case 'End':
+        e.preventDefault();
+        onSeek(duration);
+        break;
+      default:
+        break;
+    }
+  }, [currentTime, duration, onSeek]);
 
   // Get volume icon
   const getVolumeIcon = () => {
@@ -90,6 +117,14 @@ const VideoControls = ({
   const VolumeIcon = getVolumeIcon();
 
   const playbackRates = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+
+  const keyboardShortcuts = [
+    { key: 'Space', action: 'Play/Pause' },
+    { key: '←/→', action: 'Seek ±10s' },
+    { key: '↑/↓', action: 'Volume ±10%' },
+    { key: 'M', action: 'Mute/Unmute' },
+    { key: 'F', action: 'Fullscreen' }
+  ];
 
   return (
     <>
@@ -110,6 +145,14 @@ const VideoControls = ({
             className="progress-bar"
             ref={progressRef}
             onMouseDown={handleProgressMouseDown}
+            onKeyDown={handleProgressKeyDown}
+            role="slider"
+            aria-label="Video progress"
+            aria-valuemin={0}
+            aria-valuemax={duration}
+            aria-valuenow={currentTime}
+            aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
+            tabIndex={0}
           >
             <div className="progress-background" />
             <div 
@@ -128,7 +171,12 @@ const VideoControls = ({
           {/* Left Side Controls */}
           <div className="controls-left">
             {/* Play/Pause Button */}
-            <button className="control-button play-button" onClick={onPlay}>
+            <button 
+              className="control-button play-button" 
+              onClick={onPlay}
+              aria-label={isPlaying ? 'Pause video' : 'Play video'}
+              title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
+            >
               {isPlaying ? <IoPause size={20} /> : <IoPlay size={20} />}
             </button>
 
@@ -138,7 +186,12 @@ const VideoControls = ({
               onMouseEnter={() => setIsVolumeHovered(true)}
               onMouseLeave={() => setIsVolumeHovered(false)}
             >
-              <button className="control-button volume-button" onClick={onMute}>
+              <button 
+                className="control-button volume-button" 
+                onClick={onMute}
+                aria-label={isMuted ? 'Unmute' : 'Mute'}
+                title={isMuted ? 'Unmute (M)' : 'Mute (M)'}
+              >
                 <VolumeIcon size={20} />
               </button>
               
@@ -147,6 +200,13 @@ const VideoControls = ({
                   className="volume-bar"
                   ref={volumeRef}
                   onMouseDown={handleVolumeMouseDown}
+                  role="slider"
+                  aria-label="Volume"
+                  aria-valuemin={0}
+                  aria-valuemax={1}
+                  aria-valuenow={isMuted ? 0 : volume}
+                  aria-valuetext={`Volume ${Math.round((isMuted ? 0 : volume) * 100)}%`}
+                  tabIndex={0}
                 >
                   <div className="volume-background" />
                   <div 
@@ -162,7 +222,7 @@ const VideoControls = ({
             </div>
 
             {/* Time Display */}
-            <div className="time-display">
+            <div className="time-display" aria-live="polite">
               <span className="current-time">{formatTime(currentTime)}</span>
               <span className="time-separator"> / </span>
               <span className="duration">{formatTime(duration)}</span>
@@ -171,11 +231,41 @@ const VideoControls = ({
 
           {/* Right Side Controls */}
           <div className="controls-right">
+            {/* Keyboard Shortcuts Help */}
+            <div className="keyboard-help-control">
+              <button 
+                className="control-button keyboard-button" 
+                onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
+                aria-label="Show keyboard shortcuts"
+                title="Keyboard shortcuts"
+              >
+                <IoKeypad size={20} />
+              </button>
+              
+              {showKeyboardHelp && (
+                <div className="keyboard-help-menu">
+                  <div className="keyboard-help-header">
+                    <h4>Keyboard Shortcuts</h4>
+                  </div>
+                  <div className="keyboard-shortcuts-list">
+                    {keyboardShortcuts.map((shortcut, index) => (
+                      <div key={index} className="keyboard-shortcut">
+                        <kbd className="keyboard-key">{shortcut.key}</kbd>
+                        <span className="keyboard-action">{shortcut.action}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Playback Rate */}
             <div className="playback-rate-control">
               <button 
                 className="control-button rate-button" 
                 onClick={() => setShowPlaybackRates(!showPlaybackRates)}
+                aria-label={`Playback speed ${playbackRate}x`}
+                title="Playback speed"
               >
                 {playbackRate}x
               </button>
@@ -190,6 +280,7 @@ const VideoControls = ({
                         onPlaybackRateChange(rate);
                         setShowPlaybackRates(false);
                       }}
+                      aria-label={`${rate}x speed`}
                     >
                       {rate}x
                     </button>
@@ -199,12 +290,22 @@ const VideoControls = ({
             </div>
 
             {/* Quality Settings */}
-            <button className="control-button settings-button" onClick={onQualityClick}>
+            <button 
+              className="control-button settings-button" 
+              onClick={onQualityClick}
+              aria-label="Quality settings"
+              title="Quality settings"
+            >
               <IoSettings size={20} />
             </button>
 
             {/* Fullscreen Button */}
-            <button className="control-button fullscreen-button" onClick={onFullscreen}>
+            <button 
+              className="control-button fullscreen-button" 
+              onClick={onFullscreen}
+              aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+              title={isFullscreen ? 'Exit fullscreen (F)' : 'Fullscreen (F)'}
+            >
               {isFullscreen ? <IoContract size={20} /> : <IoExpand size={20} />}
             </button>
           </div>

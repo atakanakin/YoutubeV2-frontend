@@ -42,11 +42,17 @@
   cursor: pointer;
   border-radius: 3px;
   overflow: hidden;
+  outline: none;
 }
 
 .progress-bar:hover {
   height: 8px;
   margin-top: -1px;
+}
+
+.progress-bar:focus-visible {
+  outline: 2px solid var(--youtube-red);
+  outline-offset: 2px;
 }
 
 .progress-background {
@@ -81,7 +87,8 @@
   transition: opacity 0.2s ease;
 }
 
-.progress-bar:hover .progress-handle {
+.progress-bar:hover .progress-handle,
+.progress-bar:focus .progress-handle {
   opacity: 1;
 }
 
@@ -114,10 +121,16 @@
   transition: background-color 0.2s ease, opacity 0.2s ease;
   min-width: 40px;
   height: 40px;
+  position: relative;
 }
 
 .control-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.control-button:focus-visible {
+  outline: 2px solid var(--youtube-red);
+  outline-offset: 2px;
 }
 
 .control-button:active {
@@ -162,6 +175,12 @@
   cursor: pointer;
   border-radius: 3px;
   overflow: hidden;
+  outline: none;
+}
+
+.volume-bar:focus-visible {
+  outline: 2px solid var(--youtube-red);
+  outline-offset: 2px;
 }
 
 .volume-background {
@@ -209,6 +228,73 @@
   opacity: 0.7;
 }
 
+/* ===== KEYBOARD HELP CONTROL ===== */
+.keyboard-help-control {
+  position: relative;
+}
+
+.keyboard-help-menu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  border-radius: var(--youtube-radius-md);
+  padding: var(--youtube-space-md);
+  margin-bottom: var(--youtube-space-sm);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 200px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.keyboard-help-header {
+  margin-bottom: var(--youtube-space-sm);
+  padding-bottom: var(--youtube-space-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.keyboard-help-header h4 {
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  margin: 0;
+}
+
+.keyboard-shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--youtube-space-xs);
+}
+
+.keyboard-shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--youtube-space-md);
+}
+
+.keyboard-key {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--youtube-radius-sm);
+  padding: 2px 6px;
+  font-family: "Roboto Mono", monospace;
+  font-size: 11px;
+  color: white;
+  min-width: 24px;
+  text-align: center;
+  display: inline-block;
+}
+
+.keyboard-action {
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  flex: 1;
+  text-align: right;
+}
+
 /* ===== PLAYBACK RATE CONTROL ===== */
 .playback-rate-control {
   position: relative;
@@ -254,6 +340,11 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.rate-option:focus-visible {
+  outline: 2px solid var(--youtube-red);
+  outline-offset: -2px;
+}
+
 .rate-option.active {
   background-color: var(--youtube-red);
 }
@@ -285,6 +376,10 @@
   
   .volume-bar {
     width: 60px;
+  }
+  
+  .keyboard-help-control {
+    display: none; /* Hide keyboard help on mobile */
   }
 }
 
@@ -346,6 +441,24 @@
   outline-offset: 2px;
 }
 
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .control-button {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .keyboard-help-menu {
+    background-color: black;
+    border: 2px solid white;
+  }
+  
+  .keyboard-key {
+    background-color: white;
+    color: black;
+    border-color: black;
+  }
+}
+
 /* ===== TOUCH OPTIMIZATIONS ===== */
 @media (hover: none) and (pointer: coarse) {
   .control-button {
@@ -366,5 +479,24 @@
   .volume-control:hover .volume-slider {
     opacity: 0;
     visibility: hidden;
+  }
+  
+  /* Ensure keyboard shortcuts are hidden on touch devices */
+  .keyboard-help-control {
+    display: none;
+  }
+}
+
+/* ===== REDUCED MOTION SUPPORT ===== */
+@media (prefers-reduced-motion: reduce) {
+  .control-button,
+  .progress-fill,
+  .volume-fill,
+  .volume-handle {
+    transition: none;
+  }
+  
+  .keyboard-help-menu {
+    backdrop-filter: none;
   }
 } 
