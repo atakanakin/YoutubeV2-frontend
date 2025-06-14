@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <main>
+      <main style={{ marginTop: '64px' }}>
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h1>YouTube V2</h1>
           <p>Testing things!</p>

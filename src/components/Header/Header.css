@@ -6,8 +6,9 @@
   height: 64px;
   display: flex;
   align-items: center;
-  position: sticky;
+  position: fixed;
   top: 0;
+  width: 100%;
   z-index: 1000;
   transition: background-color 0.2s ease;
 }
