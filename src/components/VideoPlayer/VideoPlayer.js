@@ -70,7 +70,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     if (typeof window !== 'undefined') {
       try {
         storedPref = localStorage.getItem('preferredVideoQuality');
-      } catch (_) {}
+      } catch (_) { }
     }
     const videoDefault = videoStreams?.find(stream => {
       if (storedPref && String(stream.quality).includes(storedPref)) return true;
@@ -638,7 +638,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
     // Persist preferred resolution (e.g., '1440p')
     const match = stream.quality.match(/\d+p/);
     if (match && typeof window !== 'undefined') {
-      try { localStorage.setItem('preferredVideoQuality', match[0]); } catch(_) {}
+      try { localStorage.setItem('preferredVideoQuality', match[0]); } catch (_) { }
     }
 
     // Wait for video to be ready, then restore state
@@ -729,7 +729,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
         className="video-element"
         src={selectedVideoStream.url}
         poster={posterUrl}
-        preload="metadata"
+        preload="auto"
         playsInline
         onClick={togglePlay}
       />
@@ -738,7 +738,7 @@ const VideoPlayer = ({ videoStreams, audioStreams, metadata }) => {
       <audio
         ref={audioRef}
         src={selectedAudioStream.url}
-        preload="metadata"
+        preload="auto"
         style={{ display: 'none' }}
       />
 
